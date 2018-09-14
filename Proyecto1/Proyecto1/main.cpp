@@ -5,7 +5,10 @@
 //#include <GL/glut.h>
 //#include <stdlib.h>
 #include "Main.h"
-int rot;
+float rot = 0.0;
+float movKit = 0.0;
+float orientacion = 180.0;
+float desicion = 1.0;
 float camaraZ = 0.0;
 float camaraY = 0.0;
 float camaraX = 0.0;
@@ -44,10 +47,11 @@ void reshape(int w, int h)
 	 // Usamos proyeccion ortogonal
 	  //glOrtho(-200, 200, -200, 200, -200, 200);
 	 gluPerspective(30.0f, (GLfloat)800/(GLfloat)600, 0.03, 1000.0);
-	 // Activamos la matriz de modelado/visionado. 
+	 // Activamos la matriz de modelado/visionado. //
 	 glMatrixMode(GL_MODELVIEW);
 	 // "Limpiamos" la matriz
 	 glLoadIdentity();
+	 //gluLookAt(camaraX, camaraY, -5.0 + camaraZ, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 	 return;
 }
 void cubo(float color1, float color2, float color3)
@@ -127,14 +131,30 @@ void display(void)
 
 	 glMatrixMode( GL_MODELVIEW_MATRIX );
 	 glLoadIdentity();
-	 glTranslatef(camaraX, camaraY, -5.0 + camaraZ);
- 
-	 glTranslatef(0.0,0.0,-20.0);
-	 // Rotacion de 30 grados en torno al eje x
+	 gluLookAt( -0.65*movKit+camaraY, 0*camaraY, camaraZ,
+		 -0.09*movKit + 1*camaraX, 0.0, -5.0 ,
+				0.0, 0.5, 0.0);
+		 
+	 glTranslatef(0.0, 0.0, -20.0);
 	 glRotated(30.0, 1.0, 0.0, 0.0);
+
+	 glPushMatrix();
+		 glTranslatef(0.0, -0.75,0.0);
+		 glScalef(7.0, 0.5, 7.0);
+		 cubo(0.0, 0.0, 1.0);
+	 glPopMatrix();
+	 glPushMatrix();
+	    glRotatef(90, 0, 1, 0);
+		glTranslatef(0.0, 0.0, movKit);
+		glRotatef(orientacion, 0.0, 1.0, 0.0);
+		cubo(colorX, colorY, colorZ);
+	 glPopMatrix();
+	 
+	 //glTranslatef(camaraX, camaraY, -5.0 + camaraZ);
+	
 	 // Rotacion de -30 grados en torno al eje y
 	 //glRotated(-30.0, 0.0, 1.0, 0.0);
-	 glRotated(-rot, 0.0, 1.0, 0.0);
+	 //glRotated(-rot, 0.0, 1.0, 0.0);
 	 // Dibujamos una "Tetera" y le aplico el material
 
 	 /*glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
@@ -143,7 +163,8 @@ void display(void)
 	 glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);*/
 	 //glutSolidTeapot(1.0);
 	 //glColor3f(colorX, colorY, colorZ);
-	 cubo(colorX,colorY, colorZ);
+	 
+	 
 	 //glutWireSphere(5,20,20);
 	 //glutSolidSphere(5, 20, 20);
 	 //glutWireCube(2.0f);
@@ -155,13 +176,53 @@ void display(void)
 
 void animacion()
 {
-	if(animaD && anima)
+	if (anima)
 	{
-		rot += 4;
-	}
-	if (animaI && anima)
-	{
-		rot -= 4;
+		if (movKit == 3)
+		{
+			desicion = 0.0;
+		}
+		if (movKit == -3)
+		{
+			desicion = 1.0;
+		}
+
+
+		if (desicion == 1.0)
+		{
+			if (movKit >= 3.0)
+			{
+				if (orientacion > 0)
+				{
+					orientacion -= 10.0;
+				}
+				else
+					movKit = 2.9;
+			}
+			else
+			{
+				movKit += 0.1;
+			}
+
+		}
+
+		if (desicion == 0.0)
+		{
+			if (movKit <= -3.0)
+			{
+				if (orientacion < 180)
+				{
+					orientacion += 10.0;
+				}
+				else
+					movKit = -2.9;
+			}
+			else
+			{
+				movKit -= 0.1;
+			}
+		}
+
 	}
 	glutPostRedisplay();
 }
@@ -204,21 +265,33 @@ void arrow_keys(int a_keys, int x, int y)  // Funcion para manejo de teclas espe
 	{
 		case GLUT_KEY_PAGE_UP:     
 			camaraY += 0.5f;
+			//glLoadIdentity();
+			//gluLookAt(camaraX, camaraY, -5.0 + camaraZ, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 			break;
 		case GLUT_KEY_PAGE_DOWN:     
 			camaraY -= 0.5f;
+			//glLoadIdentity();
+			//gluLookAt(camaraX, camaraY, -5.0 + camaraZ, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 			break;
 		case GLUT_KEY_UP:
 			camaraZ += 0.5f;
+			//glLoadIdentity();
+			//gluLookAt(camaraX, camaraY, -5.0 + camaraZ, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 			break;
 		case GLUT_KEY_DOWN:  
 			camaraZ -= 0.5f;
+			//glLoadIdentity();
+			//gluLookAt(camaraX, camaraY, -5.0 + camaraZ, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 			break;
 		case GLUT_KEY_LEFT:
 			camaraX -= 0.5f;
+			//glLoadIdentity();
+			//gluLookAt(camaraX, camaraY, -5.0 + camaraZ, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 			break;
 		case GLUT_KEY_RIGHT:
 			camaraX += 0.5f;
+			glLoadIdentity();
+			//gluLookAt(camaraX, camaraY, -5.0 + camaraZ, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 			break;
 		case GLUT_KEY_F1:
 			colorX = 1.0;
